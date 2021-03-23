@@ -9,12 +9,23 @@ global netDone
 global partDone
 global netAdded,partAdded
 netAdded , partAdded = False, False
+saved_path = ''
 def open_net():
     global netDone
     global netAdded
+    global saved_path
     netFile = filedialog.askopenfilename(initialdir="/", title="Select file",
-                                          filetypes=(("txt files", "*.txt"),
-                                          ("all files", "*.*")))
+                                          filetypes=(("All files", "*.*"),
+                                          ("All files", "*.*")))
+    
+    index = 0
+    for i in range(len(netFile)-1,-1,-1):
+        if netFile[i] =='/':
+            index = i
+            break
+    saved_path = netFile[:index]
+    print(saved_path)
+
     netdata = open(netFile,'r')
     netlines = netdata.read()
 
@@ -30,7 +41,7 @@ def open_net():
             if '/' not in data[1:]:
                 netDone[-1] += ','.join(data[1:])
             else:
-                print(' '.join(data[1:4]))
+                # print(' '.join(data[1:4]))
                 temp.append(' '.join(data[1:4]))
                 temp += data[4:]
                 netDone[-1] += ','.join(temp)
@@ -41,13 +52,14 @@ def open_net():
         netAdded = True
         open_button.config(text = "Net Added!", bg ="green")
     netdata.close()
-    print(netDone)
+    # print(netDone)
     net_label.config(text = netFile,bg="green")
 def open_part():
+    global saved_path
     global partDone
     global partAdded
     memo = {}
-    partFile = filedialog.askopenfilename(initialdir="/", title="Select file",
+    partFile = filedialog.askopenfilename(initialdir=saved_path, title="Select file",
                                           filetypes=(("txt files", "*.txt"),
                                           ("all files", "*.*")))
     partdata = open(partFile,'r')
@@ -76,7 +88,7 @@ def open_part():
         name += ';'
         partDone.append(name)
     partDone = '\n'.join(partDone)
-    print(partDone)
+    # print(partDone)
     if len(partFile) != 0:
         partAdded = True
         open_button2.config(text = "Part Added!", bg ="green")
@@ -85,13 +97,14 @@ def open_part():
 def make_ccf():
     global netAdded
     global partAdded
+    global saved_path
     CCF = []
     result = ['$CCF {\nDEFINITION {\n']
     result += partDone
     result += ['\n}\n']
     result += ['NET {\n']
     result += netDone
-    result += ['}\n}']
+    result += ['\n}\n}']
     result = ''.join(result)
 
 
@@ -99,9 +112,9 @@ def make_ccf():
         messagebox.showerror(title=None, message="File Not Added",)
 
     elif netAdded and partAdded:
-        filename = filedialog.asksaveasfilename(initialdir = "/", title= "select folder",
+        filename = filedialog.asksaveasfilename(initialdir = saved_path, title= "select folder",
         filetypes =(("ccf files","*.ccf"),("all files", "*.*")))
-        f = open(filename,'w')
+        f = open(filename+'.ccf','w')
         f.write(result)
         f.close()
         make_ccf.config(text = "Finished!",bg = "green")
