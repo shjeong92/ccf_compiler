@@ -60,8 +60,8 @@ def open_part():
     global partAdded
     memo = {}
     partFile = filedialog.askopenfilename(initialdir=saved_path, title="Select file",
-                                          filetypes=(("txt files", "*.txt"),
-                                          ("all files", "*.*")))
+                                          filetypes=(("All files", "*.*"),
+                                          ("All files", "*.*")))
     partdata = open(partFile,'r')
     partlines = partdata.read()
     datas = partlines.split('\n')
